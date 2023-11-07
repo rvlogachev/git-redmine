@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    volumes:
+      - /srv/docker/https-portal/certs:/var/lib/https-portal
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      STAGE: 'production' # 'production' 'staging' 'local'
+      FORCE_RENEW: 'true'
+    networks:
+      - default
+      - redmine_default
+      - gitlab_default
+
+networks:
+  redmine_default:
+    external: true
+  gitlab_default:
+    external: true

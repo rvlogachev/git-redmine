@@ -1,0 +1,35 @@
+version: '3.5'
+services:
+  gitlab:
+    container_name: gitlab
+    image: gitlab/gitlab-ce:latest
+    hostname: gitlab.dgital.pro
+    restart: unless-stopped
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 22
+        external_url 'http://gitlab.dgital.pro'
+    ports:
+      - 580:80
+      - 5443:443
+      - 322:22
+    volumes:
+      - ./data/docker/gitlab/etc/gitlab:/etc/gitlab
+      - ./data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
+      - ./data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+    networks:
+      - gitlab_net
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    depends_on:
+      - gitlab
+    volumes:
+      - ./data/docker/gitlab/etc/gitlab-runner:/etc/gitlab-runner
+      - ./data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - gitlab_net
+
+networks:
+  gitlab_net:
